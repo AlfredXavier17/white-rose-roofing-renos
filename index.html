@@ -391,7 +391,7 @@
       <!-- FLOORING -->
       <article class="service-card">
         <img
-          src="assets/flooring.jpeg"
+          src="assets/flooring.png"
           alt="Flooring service example"
           class="service-card-image"
         >
@@ -508,7 +508,7 @@
       <!-- CLEANING -->
       <article class="service-card">
         <img
-          src="assets/exterior-cleaning.jpeg"
+          src="assets/exterior-cleaning.png"
           alt="Exterior home cleaning service example"
           class="service-card-image"
         >
@@ -829,132 +829,129 @@
         </div>
 
 
+<!-- QUOTE FORM -->
+<form
+  id="quoteForm"
+  class="quote-form"
+  action="https://formspree.io/f/xbgjankk"
+  method="POST"
+>
 
-        <!-- QUOTE FORM -->
-        <form
-          id="quoteForm"
-          class="quote-form"
-        >
+  <div class="two-col">
 
+    <input
+      type="text"
+      name="name"
+      placeholder="Your name"
+      required
+    />
 
-          <div class="two-col">
+    <input
+      type="tel"
+      name="phone"
+      placeholder="Phone number"
+      required
+    />
 
-            <input
-              type="text"
-              placeholder="Your name"
-              required
-            />
-
-
-            <input
-              type="tel"
-              placeholder="Phone number"
-              required
-            />
-
-          </div>
-
-
-
-          <input
-            type="email"
-            placeholder="Email address"
-          />
+  </div>
 
 
-
-          <select>
-
-            <option>
-              Roof repairs / replacement
-            </option>
-
-            <option>
-              Interior / exterior renovations
-            </option>
-
-            <option>
-              Decks / fences
-            </option>
-
-            <option>
-              Drywall
-            </option>
-
-            <option>
-              Painting
-            </option>
-
-            <option>
-              Flooring
-            </option>
-
-            <option>
-              Tile / backsplash
-            </option>
-
-            <option>
-              Siding / soffit / fascia
-            </option>
-
-            <option>
-              Eavestrough cleaning / repairs
-            </option>
-
-            <option>
-              Pressure washing
-            </option>
-
-            <option>
-              Exterior / window cleaning
-            </option>
-
-            <option>
-              Landscaping
-            </option>
-
-            <option>
-              Christmas light installation / removal
-            </option>
-
-            <option>
-              Residential snow removal
-            </option>
-
-            <option>
-              Handyman services
-            </option>
-
-            <option>
-              Other
-            </option>
-
-          </select>
+  <input
+    type="email"
+    name="email"
+    placeholder="Email address"
+  />
 
 
+  <select name="service" required>
 
-          <textarea
-            placeholder="Tell us what you want done..."
-          ></textarea>
+    <option value="" disabled selected>
+      Select a service
+    </option>
+
+    <option value="Roof repairs / replacement">
+      Roof repairs / replacement
+    </option>
+
+    <option value="Interior / exterior renovations">
+      Interior / exterior renovations
+    </option>
+
+    <option value="Decks / fences">
+      Decks / fences
+    </option>
+
+    <option value="Drywall">
+      Drywall
+    </option>
+
+    <option value="Painting">
+      Painting
+    </option>
+
+    <option value="Flooring">
+      Flooring
+    </option>
+
+    <option value="Tile / backsplash">
+      Tile / backsplash
+    </option>
+
+    <option value="Siding / soffit / fascia">
+      Siding / soffit / fascia
+    </option>
+
+    <option value="Eavestrough cleaning / repairs">
+      Eavestrough cleaning / repairs
+    </option>
+
+    <option value="Pressure washing">
+      Pressure washing
+    </option>
+
+    <option value="Exterior / window cleaning">
+      Exterior / window cleaning
+    </option>
+
+    <option value="Landscaping">
+      Landscaping
+    </option>
+
+    <option value="Christmas light installation / removal">
+      Christmas light installation / removal
+    </option>
+
+    <option value="Residential snow removal">
+      Residential snow removal
+    </option>
+
+    <option value="Handyman services">
+      Handyman services
+    </option>
+
+    <option value="Other">
+      Other
+    </option>
+
+  </select>
 
 
-
-          <button
-            class="btn btn-dark"
-            type="submit"
-          >
-            Send Quote Request
-          </button>
+  <textarea
+    name="message"
+    placeholder="Tell us what you want done..."
+    required
+  ></textarea>
 
 
-          <p
-            id="formMsg"
-            class="form-msg"
-          ></p>
+  <button
+    class="btn btn-dark"
+    type="submit"
+  >
+    Send Quote Request
+  </button>
 
-
-        </form>
-
+</form>
+<!-- /////////////////////////////////////////////// -->
 
       </div>
 
