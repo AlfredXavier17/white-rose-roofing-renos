@@ -158,6 +158,16 @@ footer p{color:#777;font-size:12px;margin:6px 0}
   display: block;
 }
 
+/* AUTO-SLIDING SERVICE IMAGES */
+
+.service-slider {
+  transition: opacity .3s ease;
+}
+
+.service-slider.image-changing {
+  opacity: 0;
+}
+
 .service-image-placeholder {
   display: flex;
   flex-direction: column;
@@ -255,3 +265,4 @@ footer p{color:#777;font-size:12px;margin:6px 0}
 #services .services-heading h2 {
   color: white;
 }
+
