@@ -198,3 +198,38 @@ footer p{color:#777;font-size:12px;margin:6px 0}
 .service-card-content a {
   margin-top: auto;
 }
+
+/* SERVICES HEADING */
+
+.services-heading {
+  margin-bottom: 42px;
+}
+
+.services-heading h2 {
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 800;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+
+.services-heading p {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
+
+/* CENTER HANDYMAN WHEN IT IS ALONE ON LAST ROW */
+
+.services-grid .service-card:last-child:nth-child(3n + 1) {
+  grid-column: 2;
+}
+
+
+/* TABLET / PHONE */
+
+@media (max-width: 900px) {
+  .services-grid .service-card:last-child:nth-child(3n + 1) {
+    grid-column: auto;
+  }
+}
