@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>White Rose Admin</title>
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/favicon.jpeg"
+  >
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+</head>
+
+
+<body>
+
+
+  <!-- ADMIN LOGIN -->
+
+  <main class="admin-page">
+
+    <div class="container">
+
+      <section
+        id="adminLogin"
+        class="admin-login"
+      >
+
+        <h1>Admin Login</h1>
+
+        <p>
+          White Rose Roofing & Renos
+        </p>
+
+
+        <form id="adminLoginForm">
+
+          <input
+            type="email"
+            id="adminEmail"
+            placeholder="Email"
+            required
+          >
+
+          <input
+            type="password"
+            id="adminPassword"
+            placeholder="Password"
+            required
+          >
+
+          <button
+            type="submit"
+            class="btn btn-dark"
+          >
+            Login
+          </button>
+
+          <p id="adminLoginMessage"></p>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- ADMIN DASHBOARD -->
+
+      <section
+        id="adminDashboard"
+        class="admin-dashboard"
+        hidden
+      >
+
+        <div class="admin-dashboard-header">
+
+          <div>
+            <h1>Review Management</h1>
+
+            <p>
+              Manage customer reviews.
+            </p>
+          </div>
+
+
+          <button
+            id="adminLogout"
+            class="btn btn-dark"
+            type="button"
+          >
+            Logout
+          </button>
+
+        </div>
+
+
+        <div id="adminReviews">
+
+          <p>
+            Loading reviews...
+          </p>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <script type="module">
+
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+
+    import {
+      getFirestore,
+      collection,
+      query,
+      orderBy,
+      onSnapshot,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyCuThiqqAWeK3m3CB11JXHw0-xsfF5ZTxw",
+
+      authDomain:
+        "white-rose-roofing.firebaseapp.com",
+
+      projectId:
+        "white-rose-roofing",
+
+      storageBucket:
+        "white-rose-roofing.firebasestorage.app",
+
+      messagingSenderId:
+        "968833082749",
+
+      appId:
+        "1:968833082749:web:386370afb1c0e1e6b65814"
+
+    };
+
+
+
+    const app =
+      initializeApp(firebaseConfig);
+
+    const db =
+      getFirestore(app);
+
+    const auth =
+      getAuth(app);
+
+
+
+    const adminLogin =
+      document.getElementById("adminLogin");
+
+    const adminDashboard =
+      document.getElementById("adminDashboard");
+
+    const adminLoginForm =
+      document.getElementById("adminLoginForm");
+
+    const adminEmail =
+      document.getElementById("adminEmail");
+
+    const adminPassword =
+      document.getElementById("adminPassword");
+
+    const adminLoginMessage =
+      document.getElementById("adminLoginMessage");
+
+    const adminReviews =
+      document.getElementById("adminReviews");
+
+    const adminLogout =
+      document.getElementById("adminLogout");
+
+
+
+    // LOGIN
+
+    adminLoginForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        adminLoginMessage.textContent =
+          "Logging in...";
+
+
+        try {
+
+          await signInWithEmailAndPassword(
+            auth,
+            adminEmail.value.trim(),
+            adminPassword.value
+          );
+
+          adminLoginMessage.textContent = "";
+
+          adminLoginForm.reset();
+
+        }
+
+        catch (error) {
+
+          console.error(error);
+
+          adminLoginMessage.textContent =
+            "Incorrect email or password.";
+
+        }
+
+      }
+    );
+
+
+
+    // LOGOUT
+
+    adminLogout.addEventListener(
+      "click",
+      async function() {
+
+        await signOut(auth);
+
+      }
+    );
+
+
+
+    // CHECK LOGIN STATUS
+
+    let unsubscribeReviews = null;
+
+
+    onAuthStateChanged(
+      auth,
+      function(user) {
+
+        if (user) {
+
+          adminLogin.hidden = true;
+
+          adminDashboard.hidden = false;
+
+          loadReviews();
+
+        }
+
+        else {
+
+          adminLogin.hidden = false;
+
+          adminDashboard.hidden = true;
+
+
+          if (unsubscribeReviews) {
+
+            unsubscribeReviews();
+
+            unsubscribeReviews = null;
+
+          }
+
+        }
+
+      }
+    );
+
+
+
+    // LOAD REVIEWS
+
+    function loadReviews() {
+
+      const reviewsQuery =
+        query(
+          collection(db, "reviews"),
+          orderBy("createdAt", "desc")
+        );
+
+
+      unsubscribeReviews =
+        onSnapshot(
+          reviewsQuery,
+          function(snapshot) {
+
+            adminReviews.innerHTML = "";
+
+
+            if (snapshot.empty) {
+
+              adminReviews.textContent =
+                "There are no reviews.";
+
+              return;
+            }
+
+
+            snapshot.forEach(
+              function(reviewDocument) {
+
+                const data =
+                  reviewDocument.data();
+
+
+                const card =
+                  document.createElement("article");
+
+                card.className =
+                  "admin-review-card";
+
+
+                const stars =
+                  document.createElement("div");
+
+                stars.textContent =
+                  "★".repeat(data.rating) +
+                  "☆".repeat(5 - data.rating);
+
+
+                const name =
+                  document.createElement("h3");
+
+                name.textContent =
+                  data.name;
+
+
+                const review =
+  document.createElement("p");
+
+review.textContent =
+  data.review;
+
+
+// REVIEW DATE
+const reviewDate =
+  document.createElement("small");
+
+reviewDate.className =
+  "review-date";
+
+if (data.createdAt) {
+
+  const date =
+    data.createdAt.toDate();
+
+  reviewDate.textContent =
+    date.toLocaleDateString("en-CA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+
+}
+
+
+const deleteButton =
+  document.createElement("button");
+
+                deleteButton.type =
+                  "button";
+
+                deleteButton.className =
+                  "btn btn-dark";
+
+                deleteButton.textContent =
+                  "Delete Review";
+
+
+                deleteButton.addEventListener(
+                  "click",
+                  async function() {
+
+                    const confirmed =
+                      confirm(
+                        "Are you sure you want to delete this review?"
+                      );
+
+
+                    if (!confirmed) {
+                      return;
+                    }
+
+
+                    try {
+
+                      await deleteDoc(
+                        doc(
+                          db,
+                          "reviews",
+                          reviewDocument.id
+                        )
+                      );
+
+                    }
+
+                    catch (error) {
+
+                      console.error(error);
+
+                      alert(
+                        "Could not delete the review."
+                      );
+
+                    }
+
+                  }
+                );
+
+
+                card.appendChild(stars);
+
+card.appendChild(name);
+
+card.appendChild(review);
+
+card.appendChild(reviewDate);
+
+card.appendChild(deleteButton);
+
+                adminReviews.appendChild(card);
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+  </script>
+
+
+</body>
+
+</html>

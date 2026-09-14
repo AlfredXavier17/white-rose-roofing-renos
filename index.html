@@ -674,6 +674,67 @@
       </div>
 
     </section>
+
+
+    <!-- //reviews -->
+
+    <section class="section" id="reviews">
+  <div class="container">
+
+    <div class="section-heading">
+      <h2>Customer Reviews</h2>
+      <p>
+        See what customers have to say, or leave a review below.
+      </p>
+    </div>
+
+    <div id="reviewsList">
+      <!-- Firebase reviews will appear here -->
+    </div>
+
+    <div class="review-form-wrap">
+
+      <h3>Leave a Review</h3>
+
+      <form id="reviewForm">
+
+        <input
+          type="text"
+          id="reviewName"
+          placeholder="Your name"
+          required
+        >
+
+        <select id="reviewRating" required>
+          <option value="">Choose rating</option>
+          <option value="5">★★★★★ - 5</option>
+          <option value="4">★★★★☆ - 4</option>
+          <option value="3">★★★☆☆ - 3</option>
+          <option value="2">★★☆☆☆ - 2</option>
+          <option value="1">★☆☆☆☆ - 1</option>
+        </select>
+
+        <textarea
+          id="reviewText"
+          placeholder="Write your review..."
+          required
+        ></textarea>
+
+        <button
+          type="submit"
+          class="btn btn-dark"
+        >
+          Submit Review
+        </button>
+
+        <p id="reviewMessage"></p>
+
+      </form>
+
+    </div>
+
+  </div>
+</section>
     <!-- CONTACT -->
     <section
       class="section contact-section"
@@ -970,6 +1031,224 @@
 
 
   <script src="script.js?v=2"></script>
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuThiqqAWeK3m3CB11JXHw0-xsfF5ZTxw",
+    authDomain: "white-rose-roofing.firebaseapp.com",
+    projectId: "white-rose-roofing",
+    storageBucket: "white-rose-roofing.firebasestorage.app",
+    messagingSenderId: "968833082749",
+    appId: "1:968833082749:web:386370afb1c0e1e6b65814"
+  };
+
+
+  const app = initializeApp(firebaseConfig);
+  const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaEnterpriseProvider(
+    "6LdyorstAAAAAM3VJmA7fUY7ylpZDAPKwAkd-GHq"
+  ),
+  isTokenAutoRefreshEnabled: true
+});
+  import {
+  initializeAppCheck,
+  ReCaptchaEnterpriseProvider
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-check.js";
+
+  const db = getFirestore(app);
+
+
+  const reviewForm =
+    document.getElementById("reviewForm");
+
+  const reviewName =
+    document.getElementById("reviewName");
+
+  const reviewRating =
+    document.getElementById("reviewRating");
+
+  const reviewText =
+    document.getElementById("reviewText");
+
+  const reviewMessage =
+    document.getElementById("reviewMessage");
+
+  const reviewsList =
+    document.getElementById("reviewsList");
+
+
+  // LOAD REVIEWS FROM FIREBASE
+
+  const reviewsQuery = query(
+    collection(db, "reviews"),
+    orderBy("createdAt", "desc")
+  );
+
+
+  onSnapshot(reviewsQuery, function(snapshot) {
+
+    reviewsList.innerHTML = "";
+
+
+    if (snapshot.empty) {
+
+      const emptyMessage =
+        document.createElement("p");
+
+      emptyMessage.textContent =
+        "No reviews yet. Be the first to leave one.";
+
+      reviewsList.appendChild(emptyMessage);
+
+      return;
+    }
+
+
+    snapshot.forEach(function(reviewDocument) {
+
+      const data =
+        reviewDocument.data();
+
+
+      const reviewCard =
+        document.createElement("article");
+
+      reviewCard.className =
+        "customer-review";
+
+
+      const stars =
+        document.createElement("div");
+
+      stars.className =
+        "review-stars";
+
+      stars.textContent =
+        "★".repeat(data.rating) +
+        "☆".repeat(5 - data.rating);
+
+
+      const reviewBody =
+        document.createElement("p");
+
+      reviewBody.textContent =
+        data.review;
+
+
+      const reviewAuthor =
+        document.createElement("strong");
+
+      reviewAuthor.textContent =
+        data.name;
+        
+
+        const reviewDate =
+  document.createElement("small");
+
+reviewDate.className =
+  "review-date";
+
+if (data.createdAt) {
+
+  const date =
+    data.createdAt.toDate();
+
+  reviewDate.textContent =
+    date.toLocaleDateString("en-CA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+
+}
+
+
+      reviewCard.appendChild(stars);
+      reviewCard.appendChild(reviewBody);
+      reviewCard.appendChild(reviewAuthor);
+      reviewCard.appendChild(reviewDate);
+
+      reviewsList.appendChild(reviewCard);
+
+    });
+
+  });
+
+
+  // SUBMIT NEW REVIEW
+
+  reviewForm.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const name =
+        reviewName.value.trim();
+
+      const rating =
+        Number(reviewRating.value);
+
+      const review =
+        reviewText.value.trim();
+
+
+      if (!name || !rating || !review) {
+
+        reviewMessage.textContent =
+          "Please complete all fields.";
+
+        return;
+      }
+
+
+      try {
+
+        await addDoc(
+          collection(db, "reviews"),
+          {
+            name: name,
+            rating: rating,
+            review: review,
+            createdAt: serverTimestamp()
+          }
+        );
+
+
+        reviewForm.reset();
+
+        reviewMessage.textContent =
+          "Thank you! Your review has been posted.";
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        reviewMessage.textContent =
+          "Sorry, your review could not be posted.";
+
+      }
+
+    }
+  );
+
+</script>
 
 </body>
 </html>
